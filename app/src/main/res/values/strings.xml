@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Gym_Tracker</string>
+    <string name="workout">workout_header</string>
+    <string name="add_exercise" />
+    <string name="amount_exercises" />
+    <string name="current_date" />
+</resources>
