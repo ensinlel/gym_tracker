@@ -22,3 +22,17 @@ dependencyResolutionManagement {
 
 rootProject.name = "Gym_Tracker"
 include(":app")
+
+// Core modules
+include(":core:common")
+include(":core:database")
+include(":core:network")
+include(":core:ui")
+include(":core:testing")
+
+// Feature modules
+include(":feature:workout")
+include(":feature:exercise")
+include(":feature:statistics")
+include(":feature:profile")
+include(":feature:ai-coaching")
