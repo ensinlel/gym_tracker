@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.example.gym_tracker.core.database.GymTrackerDatabase
 import com.example.gym_tracker.core.database.dao.ExerciseDao
+import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
+import com.example.gym_tracker.core.database.dao.ExerciseSetDao
+import com.example.gym_tracker.core.database.dao.UserProfileDao
 import com.example.gym_tracker.core.database.dao.WorkoutDao
 import dagger.Module
 import dagger.Provides
@@ -25,7 +28,12 @@ object DatabaseModule {
             context,
             GymTrackerDatabase::class.java,
             "gym_tracker_database"
-        ).build()
+        )
+        .addMigrations(
+            GymTrackerDatabase.MIGRATION_1_2,
+            GymTrackerDatabase.MIGRATION_2_3
+        )
+        .build()
     }
 
     @Provides
@@ -36,5 +44,20 @@ object DatabaseModule {
     @Provides
     fun provideExerciseDao(database: GymTrackerDatabase): ExerciseDao {
         return database.exerciseDao()
+    }
+
+    @Provides
+    fun provideExerciseInstanceDao(database: GymTrackerDatabase): ExerciseInstanceDao {
+        return database.exerciseInstanceDao()
+    }
+
+    @Provides
+    fun provideExerciseSetDao(database: GymTrackerDatabase): ExerciseSetDao {
+        return database.exerciseSetDao()
+    }
+
+    @Provides
+    fun provideUserProfileDao(database: GymTrackerDatabase): UserProfileDao {
+        return database.userProfileDao()
     }
 }

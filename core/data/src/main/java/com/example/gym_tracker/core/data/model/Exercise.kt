@@ -1,13 +1,12 @@
-package com.example.gym_tracker.core.database.entity
+package com.example.gym_tracker.core.data.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.time.Instant
-import java.util.UUID
 
-@Entity(tableName = "exercises")
-data class ExerciseEntity(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+/**
+ * Domain model for Exercise
+ */
+data class Exercise(
+    val id: String,
     val name: String,
     val category: ExerciseCategory,
     val muscleGroups: List<MuscleGroup>,
