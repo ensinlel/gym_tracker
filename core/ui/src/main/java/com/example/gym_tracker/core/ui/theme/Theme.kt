@@ -10,18 +10,83 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme()
-private val LightColorScheme = lightColorScheme()
+private val DarkColorScheme = darkColorScheme(
+    primary = AccentPurple,
+    onPrimary = OnDarkPrimary,
+    primaryContainer = Purple20,
+    onPrimaryContainer = Purple80,
+    
+    secondary = AccentBlue,
+    onSecondary = OnDarkPrimary,
+    secondaryContainer = Purple20,
+    onSecondaryContainer = PurpleGrey80,
+    
+    tertiary = AccentGreen,
+    onTertiary = OnDarkPrimary,
+    tertiaryContainer = Purple20,
+    onTertiaryContainer = PurpleGrey80,
+    
+    background = DarkBackground,
+    onBackground = OnDarkPrimary,
+    
+    surface = DarkSurface,
+    onSurface = OnDarkPrimary,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = OnDarkSecondary,
+    
+    outline = DarkOutline,
+    outlineVariant = DarkOutline,
+    
+    error = ErrorRed,
+    onError = OnDarkPrimary,
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6)
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = Purple40,
+    onPrimary = OnLightPrimary,
+    primaryContainer = Purple80,
+    onPrimaryContainer = Purple20,
+    
+    secondary = PurpleGrey40,
+    onSecondary = OnLightPrimary,
+    secondaryContainer = PurpleGrey80,
+    onSecondaryContainer = Purple20,
+    
+    tertiary = AccentGreen,
+    onTertiary = OnLightPrimary,
+    tertiaryContainer = Color(0xFFD4F4E8),
+    onTertiaryContainer = Color(0xFF064E3B),
+    
+    background = LightBackground,
+    onBackground = OnLightPrimary,
+    
+    surface = LightSurface,
+    onSurface = OnLightPrimary,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = OnLightSecondary,
+    
+    outline = LightOutline,
+    outlineVariant = Color(0xFFCAC4D0),
+    
+    error = ErrorRed,
+    onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002)
+)
 
 @Composable
 fun GymTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = false, // Disabled to maintain our custom purple theme
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -29,21 +94,24 @@ fun GymTrackerTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }
