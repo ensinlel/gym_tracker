@@ -7,6 +7,7 @@ import com.example.gym_tracker.core.database.dao.ExerciseDao
 import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
 import com.example.gym_tracker.core.database.dao.UserProfileDao
+import com.example.gym_tracker.core.database.dao.WeightHistoryDao
 import com.example.gym_tracker.core.database.dao.WorkoutDao
 import dagger.Module
 import dagger.Provides
@@ -31,7 +32,8 @@ object DatabaseModule {
         )
         .addMigrations(
             GymTrackerDatabase.MIGRATION_1_2,
-            GymTrackerDatabase.MIGRATION_2_3
+            GymTrackerDatabase.MIGRATION_2_3,
+            GymTrackerDatabase.MIGRATION_3_4
         )
         .build()
     }
@@ -59,5 +61,10 @@ object DatabaseModule {
     @Provides
     fun provideUserProfileDao(database: GymTrackerDatabase): UserProfileDao {
         return database.userProfileDao()
+    }
+
+    @Provides
+    fun provideWeightHistoryDao(database: GymTrackerDatabase): WeightHistoryDao {
+        return database.weightHistoryDao()
     }
 }

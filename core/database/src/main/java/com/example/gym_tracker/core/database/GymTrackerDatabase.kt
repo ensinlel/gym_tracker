@@ -10,11 +10,13 @@ import com.example.gym_tracker.core.database.dao.ExerciseDao
 import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
 import com.example.gym_tracker.core.database.dao.UserProfileDao
+import com.example.gym_tracker.core.database.dao.WeightHistoryDao
 import com.example.gym_tracker.core.database.dao.WorkoutDao
 import com.example.gym_tracker.core.database.entity.ExerciseEntity
 import com.example.gym_tracker.core.database.entity.ExerciseInstanceEntity
 import com.example.gym_tracker.core.database.entity.ExerciseSetEntity
 import com.example.gym_tracker.core.database.entity.UserProfileEntity
+import com.example.gym_tracker.core.database.entity.WeightHistoryEntity
 import com.example.gym_tracker.core.database.entity.WorkoutEntity
 
 @Database(
@@ -23,9 +25,10 @@ import com.example.gym_tracker.core.database.entity.WorkoutEntity
         ExerciseEntity::class,
         ExerciseInstanceEntity::class,
         ExerciseSetEntity::class,
-        UserProfileEntity::class
+        UserProfileEntity::class,
+        WeightHistoryEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -35,6 +38,7 @@ abstract class GymTrackerDatabase : RoomDatabase() {
     abstract fun exerciseInstanceDao(): ExerciseInstanceDao
     abstract fun exerciseSetDao(): ExerciseSetDao
     abstract fun userProfileDao(): UserProfileDao
+    abstract fun weightHistoryDao(): WeightHistoryDao
     
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -159,6 +163,33 @@ abstract class GymTrackerDatabase : RoomDatabase() {
                 // Drop old table and rename new one
                 database.execSQL("DROP TABLE exercises")
                 database.execSQL("ALTER TABLE exercises_new RENAME TO exercises")
+            }
+        }
+        
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add isStarMarked column to exercises table
+                database.execSQL("""
+                    ALTER TABLE exercises ADD COLUMN isStarMarked INTEGER NOT NULL DEFAULT 0
+                """.trimIndent())
+                
+                // Create weight_history table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS weight_history (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        userProfileId TEXT NOT NULL,
+                        weight REAL NOT NULL,
+                        recordedDate INTEGER NOT NULL,
+                        notes TEXT NOT NULL DEFAULT '',
+                        FOREIGN KEY(userProfileId) REFERENCES user_profile(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                
+                // Create index for better query performance
+                database.execSQL("""
+                    CREATE INDEX IF NOT EXISTS index_weight_history_userProfileId_recordedDate 
+                    ON weight_history(userProfileId, recordedDate)
+                """.trimIndent())
             }
         }
     }

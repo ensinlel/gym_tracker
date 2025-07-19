@@ -1,9 +1,11 @@
 package com.example.gym_tracker.core.data.di
 
+import com.example.gym_tracker.core.data.repository.AnalyticsRepository
 import com.example.gym_tracker.core.data.repository.ExerciseRepository
 import com.example.gym_tracker.core.data.repository.ExerciseSetRepository
 import com.example.gym_tracker.core.data.repository.UserProfileRepository
 import com.example.gym_tracker.core.data.repository.WorkoutRepository
+import com.example.gym_tracker.core.data.repository.impl.AnalyticsRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseSetRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.UserProfileRepositoryImpl
@@ -44,4 +46,10 @@ abstract class DataModule {
     abstract fun bindUserProfileRepository(
         userProfileRepositoryImpl: UserProfileRepositoryImpl
     ): UserProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnalyticsRepository(
+        analyticsRepositoryImpl: AnalyticsRepositoryImpl
+    ): AnalyticsRepository
 }

@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 
 class Converters {
     private val gson = Gson()
@@ -80,5 +81,15 @@ class Converters {
             val listType = object : TypeToken<List<Equipment>>() {}.type
             gson.fromJson(it, listType)
         }
+    }
+    
+    @TypeConverter
+    fun fromLocalDate(value: LocalDate?): Long? {
+        return value?.toEpochDay()
+    }
+    
+    @TypeConverter
+    fun toLocalDate(value: Long?): LocalDate? {
+        return value?.let { LocalDate.ofEpochDay(it) }
     }
 }

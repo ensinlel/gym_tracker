@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gym_tracker.core.ui.components.*
 import com.example.gym_tracker.core.ui.theme.GymTrackerTheme
+import com.example.gym_tracker.feature.statistics.DashboardAnalyticsContainer
 import java.time.LocalDate
 
 /**
@@ -22,6 +23,7 @@ import java.time.LocalDate
 @Composable
 fun DashboardScreen(
     onNavigateToWorkouts: () -> Unit = {},
+    onNavigateToExerciseSelection: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -58,70 +60,22 @@ fun DashboardScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            // Calendar Card
+            // Analytics Cards - replacing old placeholder stats
             item {
-                CalendarCard(
-                    selectedDate = LocalDate.now(),
-                    workoutDates = getSampleWorkoutDates(),
-                    onDateSelected = { /* Handle date selection */ }
-                )
-            }
-            
-            // Stats Row
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    StatsCard(
-                        title = "This Week",
-                        value = "3",
-                        subtitle = "workouts",
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    StatsCard(
-                        title = "Total Volume",
-                        value = "2.4k",
-                        subtitle = "kg lifted",
-                        color = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-            
-            // Goals Progress
-            item {
-                DashboardCard(
-                    title = "My Goals",
-                    content = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            ProgressRing(
-                                title = "Squat Goal",
-                                progress = 0.75f,
-                                progressText = "75%",
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                            
-                            ProgressRing(
-                                title = "Bench Goal",
-                                progress = 0.60f,
-                                progressText = "60%",
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            
-                            ProgressRing(
-                                title = "Deadlift Goal",
-                                progress = 0.85f,
-                                progressText = "85%",
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
-                    }
+                DashboardAnalyticsContainer(
+                    onAddWeightClick = { 
+                        // Navigate to weight tracking screen
+                        // For now, this will be handled by the WeightProgressCard itself
+                    },
+                    onViewWeightHistoryClick = { 
+                        // Navigate to weight tracking screen
+                        // For now, this will be handled by the WeightProgressCard itself
+                    },
+                    onExerciseStarClick = { exerciseId, isStarred -> 
+                        // Handle exercise star marking
+                        // This is handled by the analytics system
+                    },
+                    onNavigateToExerciseSelection = onNavigateToExerciseSelection
                 )
             }
             

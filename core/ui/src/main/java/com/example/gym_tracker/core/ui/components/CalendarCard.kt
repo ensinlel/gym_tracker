@@ -27,8 +27,13 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 /**
- * Calendar card component inspired by your design
- * Shows current month with workout indicators
+ * Calendar card component that shows workout indicators and allows viewing workout summaries
+ * 
+ * This component displays:
+ * - Calendar showing days with workout entries (Requirement 6.1)
+ * - Visual indicators for days with workouts (Requirement 6.2)
+ * - Current month by default (Requirement 6.3)
+ * - Support for tapping a day to show workout summary (Requirement 6.4)
  */
 @Composable
 fun CalendarCard(
@@ -52,7 +57,13 @@ fun CalendarCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { currentMonth = currentMonth.minusMonths(1) }
+                    onClick = { 
+                        currentMonth = currentMonth.minusMonths(1)
+                        // Reset selected date when changing months
+                        if (selectedDate.month != currentMonth.month) {
+                            onDateSelected(currentMonth.atDay(1))
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowLeft,
@@ -61,15 +72,26 @@ fun CalendarCard(
                     )
                 }
                 
+                // Count only workouts in the current month
+                val workoutsInCurrentMonth = workoutDates.count { 
+                    YearMonth.from(it) == currentMonth 
+                }
+                
                 Text(
-                    text = "${workoutDates.size} workouts",
+                    text = "$workoutsInCurrentMonth workout${if (workoutsInCurrentMonth != 1) "s" else ""}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = AccentPurple,
                     fontWeight = FontWeight.Medium
                 )
                 
                 IconButton(
-                    onClick = { currentMonth = currentMonth.plusMonths(1) }
+                    onClick = { 
+                        currentMonth = currentMonth.plusMonths(1)
+                        // Reset selected date when changing months
+                        if (selectedDate.month != currentMonth.month) {
+                            onDateSelected(currentMonth.atDay(1))
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowRight,

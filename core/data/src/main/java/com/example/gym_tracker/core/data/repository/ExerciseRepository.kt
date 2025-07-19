@@ -93,4 +93,9 @@ interface ExerciseRepository {
      * Delete exercise by ID
      */
     suspend fun deleteExerciseById(id: String)
+    
+    /**
+     * Seed database with sample exercises
+     */
+    suspend fun seedSampleExercises()
 }

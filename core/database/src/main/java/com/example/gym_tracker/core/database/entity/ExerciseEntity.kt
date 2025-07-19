@@ -15,7 +15,8 @@ data class ExerciseEntity(
     val instructions: List<String>,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val isCustom: Boolean = false
+    val isCustom: Boolean = false,
+    val isStarMarked: Boolean = false
 )
 
 enum class ExerciseCategory {

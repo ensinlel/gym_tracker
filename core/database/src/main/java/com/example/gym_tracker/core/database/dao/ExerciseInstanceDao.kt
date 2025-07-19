@@ -17,6 +17,9 @@ interface ExerciseInstanceDao {
     @Query("SELECT * FROM exercise_instances WHERE workoutId = :workoutId ORDER BY orderInWorkout ASC")
     fun getExerciseInstancesByWorkout(workoutId: String): Flow<List<ExerciseInstanceEntity>>
     
+    @Query("SELECT * FROM exercise_instances WHERE exerciseId = :exerciseId ORDER BY orderInWorkout ASC")
+    fun getExerciseInstancesByExerciseId(exerciseId: String): Flow<List<ExerciseInstanceEntity>>
+    
     @Query("SELECT * FROM exercise_instances WHERE id = :id")
     suspend fun getExerciseInstanceById(id: String): ExerciseInstanceEntity?
     

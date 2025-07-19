@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.gym_tracker.feature.workout.WorkoutScreen
+import com.example.gym_tracker.feature.exercise.ExerciseSelectionScreen
+import com.example.gym_tracker.feature.profile.WeightTrackingScreen
 import com.example.gym_tracker.ui.dashboard.DashboardScreen
 
 /**
@@ -33,12 +35,12 @@ fun GymTrackerNavigation(
             WorkoutScreen()
         }
         
-        composable(Screen.Statistics.route) {
-            StatisticsScreen()
+        composable(Screen.ExerciseSelection.route) {
+            ExerciseSelectionScreen()
         }
         
         composable(Screen.Profile.route) {
-            ProfileScreen()
+            WeightTrackingScreen()
         }
     }
 }
@@ -49,7 +51,7 @@ fun GymTrackerNavigation(
 sealed class Screen(val route: String, val title: String) {
     object Dashboard : Screen("dashboard", "Dashboard")
     object Workouts : Screen("workouts", "Workouts")
-    object Statistics : Screen("statistics", "Statistics")
+    object ExerciseSelection : Screen("exercise_selection", "Exercises")
     object Profile : Screen("profile", "Profile")
 }
 
@@ -61,15 +63,5 @@ private fun StatisticsScreen() {
         contentAlignment = androidx.compose.ui.Alignment.Center
     ) {
         androidx.compose.material3.Text("Statistics - Coming Soon")
-    }
-}
-
-@Composable
-private fun ProfileScreen() {
-    androidx.compose.foundation.layout.Box(
-        modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-        contentAlignment = androidx.compose.ui.Alignment.Center
-    ) {
-        androidx.compose.material3.Text("Profile - Coming Soon")
     }
 }

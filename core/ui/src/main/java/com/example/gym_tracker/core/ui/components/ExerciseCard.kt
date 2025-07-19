@@ -7,6 +7,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,8 +32,10 @@ fun ExerciseCard(
     weight: String? = null,
     isCompleted: Boolean = false,
     progress: Float? = null,
+    isStarred: Boolean = false,
     onClick: () -> Unit,
     onAddSet: (() -> Unit)? = null,
+    onStarClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -88,23 +92,44 @@ fun ExerciseCard(
                 }
             }
             
-            // Right side - Add button
-            onAddSet?.let {
-                IconButton(
-                    onClick = it,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = AccentPurple.copy(alpha = 0.1f),
-                            shape = CircleShape
+            // Right side - Star and Add buttons
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Star button for marking as favorite/PR tracking
+                onStarClick?.let {
+                    IconButton(
+                        onClick = it,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isStarred) Icons.Filled.Star else Icons.Outlined.Star,
+                            contentDescription = if (isStarred) "Remove from PR tracking" else "Add to PR tracking",
+                            tint = if (isStarred) WarningYellow else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
                         )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add set",
-                        tint = AccentPurple,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    }
+                }
+                
+                // Add set button
+                onAddSet?.let {
+                    IconButton(
+                        onClick = it,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = AccentPurple.copy(alpha = 0.1f),
+                                shape = CircleShape
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add set",
+                            tint = AccentPurple,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
@@ -171,32 +196,38 @@ private fun ExerciseCardPreview() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             ExerciseCard(
-                exerciseName = "Hammer curl",
-                sets = 2,
-                reps = "12",
-                weight = "12 kg",
+                exerciseName = "Bench Press",
+                sets = 3,
+                reps = "8-10",
+                weight = "225 lbs",
                 isCompleted = false,
                 progress = 0.6f,
+                isStarred = true,
                 onClick = {},
-                onAddSet = {}
+                onAddSet = {},
+                onStarClick = {}
             )
             
             ExerciseCard(
-                exerciseName = "Concentration curl",
-                sets = 1,
-                reps = "8-12",
-                weight = "140 kg",
+                exerciseName = "Squat",
+                sets = 4,
+                reps = "6-8",
+                weight = "315 lbs",
                 isCompleted = true,
+                isStarred = false,
                 onClick = {},
-                onAddSet = {}
+                onAddSet = {},
+                onStarClick = {}
             )
             
             ExerciseCard(
-                exerciseName = "Dumbbell bicep curl",
-                sets = 2,
-                reps = "10",
-                weight = "146 kg",
-                onClick = {}
+                exerciseName = "Deadlift",
+                sets = 1,
+                reps = "5",
+                weight = "405 lbs",
+                isStarred = true,
+                onClick = {},
+                onStarClick = {}
             )
         }
     }
