@@ -82,4 +82,99 @@ interface ExerciseDao {
     
     @Query("DELETE FROM exercises WHERE id = :id")
     suspend fun deleteExerciseById(id: String)
+    
+    // Advanced Query Capabilities - Task 3.2
+    
+    /**
+     * Full-text search across exercise name, instructions, and muscle groups
+     * Supports searching multiple terms and partial matches
+     */
+    @Query("""
+        SELECT * FROM exercises 
+        WHERE name LIKE '%' || :searchQuery || '%' 
+           OR instructions LIKE '%' || :searchQuery || '%'
+           OR muscleGroups LIKE '%' || :searchQuery || '%'
+           OR category LIKE '%' || :searchQuery || '%'
+        ORDER BY 
+            CASE 
+                WHEN name LIKE :searchQuery || '%' THEN 1
+                WHEN name LIKE '%' || :searchQuery || '%' THEN 2
+                ELSE 3
+            END,
+            name ASC
+    """)
+    fun fullTextSearchExercises(searchQuery: String): Flow<List<ExerciseEntity>>
+    
+    /**
+     * Paginated exercise search with offset and limit
+     */
+    @Query("""
+        SELECT * FROM exercises 
+        WHERE name LIKE '%' || :searchQuery || '%' 
+           OR instructions LIKE '%' || :searchQuery || '%'
+           OR muscleGroups LIKE '%' || :searchQuery || '%'
+        ORDER BY name ASC
+        LIMIT :limit OFFSET :offset
+    """)
+    suspend fun searchExercisesPaginated(
+        searchQuery: String, 
+        limit: Int, 
+        offset: Int
+    ): List<ExerciseEntity>
+    
+    /**
+     * Get exercises with usage statistics for analytics
+     */
+    @Query("""
+        SELECT e.*, 
+               COUNT(ei.id) as usage_count,
+               MAX(w.startTime) as last_used,
+               AVG(es.weight) as avg_weight,
+               MAX(es.weight) as max_weight
+        FROM exercises e
+        LEFT JOIN exercise_instances ei ON e.id = ei.exerciseId
+        LEFT JOIN workouts w ON ei.workoutId = w.id
+        LEFT JOIN exercise_sets es ON ei.id = es.exerciseInstanceId AND es.isWarmup = 0
+        WHERE w.startTime >= :startTime OR w.startTime IS NULL
+        GROUP BY e.id
+        ORDER BY usage_count DESC, e.name ASC
+    """)
+    fun getExercisesWithUsageStats(startTime: Long): Flow<List<ExerciseEntity>>
+    
+    /**
+     * Search exercises by multiple muscle groups (AND operation)
+     */
+    @Query("""
+        SELECT * FROM exercises 
+        WHERE (:muscleGroup1 = '' OR muscleGroups LIKE '%' || :muscleGroup1 || '%')
+          AND (:muscleGroup2 = '' OR muscleGroups LIKE '%' || :muscleGroup2 || '%')
+          AND (:muscleGroup3 = '' OR muscleGroups LIKE '%' || :muscleGroup3 || '%')
+        ORDER BY name ASC
+    """)
+    fun getExercisesByMultipleMuscleGroups(
+        muscleGroup1: String = "",
+        muscleGroup2: String = "",
+        muscleGroup3: String = ""
+    ): Flow<List<ExerciseEntity>>
+    
+    /**
+     * Get exercise recommendations based on workout history and muscle group balance
+     */
+    @Query("""
+        SELECT e.* FROM exercises e
+        WHERE e.id NOT IN (
+            SELECT DISTINCT ei.exerciseId 
+            FROM exercise_instances ei
+            INNER JOIN workouts w ON ei.workoutId = w.id
+            WHERE w.startTime >= :recentWorkoutThreshold
+        )
+        AND (:targetMuscleGroup = '' OR e.muscleGroups LIKE '%' || :targetMuscleGroup || '%')
+        ORDER BY RANDOM()
+        LIMIT :limit
+    """)
+    fun getExerciseRecommendations(
+        recentWorkoutThreshold: Long,
+        targetMuscleGroup: String = "",
+        limit: Int = 10
+    ): Flow<List<ExerciseEntity>>
 }

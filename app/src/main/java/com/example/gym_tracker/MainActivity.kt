@@ -3,6 +3,8 @@ package com.example.gym_tracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -72,9 +75,15 @@ fun GymTrackerBottomNavigation(
             
             NavigationBarItem(
                 icon = {
+                    val scale by animateFloatAsState(
+                        targetValue = if (selected) 1.2f else 1.0f,
+                        animationSpec = tween(200),
+                        label = "icon_scale"
+                    )
                     Icon(
                         imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.screen.title
+                        contentDescription = item.screen.title,
+                        modifier = Modifier.scale(scale)
                     )
                 },
                 label = {
