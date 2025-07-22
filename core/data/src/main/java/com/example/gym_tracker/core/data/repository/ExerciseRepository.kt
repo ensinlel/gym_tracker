@@ -1,7 +1,7 @@
 package com.example.gym_tracker.core.data.repository
 
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
 import com.example.gym_tracker.core.data.model.Exercise
-import com.example.gym_tracker.core.data.model.ExerciseCategory
 import kotlinx.coroutines.flow.Flow
 
 /**

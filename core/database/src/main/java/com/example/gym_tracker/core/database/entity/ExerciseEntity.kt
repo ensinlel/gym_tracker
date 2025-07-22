@@ -2,6 +2,9 @@ package com.example.gym_tracker.core.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.gym_tracker.core.common.enums.Equipment
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
+import com.example.gym_tracker.core.common.enums.MuscleGroup
 import java.time.Instant
 import java.util.UUID
 
@@ -18,17 +21,3 @@ data class ExerciseEntity(
     val isCustom: Boolean = false,
     val isStarMarked: Boolean = false
 )
-
-enum class ExerciseCategory {
-    CHEST, BACK, SHOULDERS, ARMS, LEGS, CORE, CARDIO, FULL_BODY
-}
-
-enum class MuscleGroup {
-    CHEST, UPPER_BACK, LOWER_BACK, FRONT_DELTS, SIDE_DELTS, REAR_DELTS,
-    BICEPS, TRICEPS, FOREARMS, QUADRICEPS, HAMSTRINGS, GLUTES, CALVES,
-    ABS, OBLIQUES, LOWER_BACK_MUSCLES
-}
-
-enum class Equipment {
-    BARBELL, DUMBBELL, CABLE, MACHINE, BODYWEIGHT, RESISTANCE_BAND, KETTLEBELL, OTHER
-}

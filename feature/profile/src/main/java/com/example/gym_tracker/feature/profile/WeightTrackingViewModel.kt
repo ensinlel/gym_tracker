@@ -2,12 +2,12 @@ package com.example.gym_tracker.feature.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gym_tracker.core.common.enums.FitnessGoal
+import com.example.gym_tracker.core.common.enums.FitnessLevel
 import com.example.gym_tracker.core.data.model.WeightHistory
 import com.example.gym_tracker.core.data.repository.AnalyticsRepository
 import com.example.gym_tracker.core.database.dao.UserProfileDao
 import com.example.gym_tracker.core.database.entity.UserProfileEntity
-import com.example.gym_tracker.core.database.entity.FitnessLevel
-import com.example.gym_tracker.core.database.entity.FitnessGoal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

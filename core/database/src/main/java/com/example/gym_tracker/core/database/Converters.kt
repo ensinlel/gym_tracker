@@ -1,7 +1,11 @@
 package com.example.gym_tracker.core.database
 
 import androidx.room.TypeConverter
-import com.example.gym_tracker.core.database.entity.*
+import com.example.gym_tracker.core.common.enums.Equipment
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
+import com.example.gym_tracker.core.common.enums.FitnessGoal
+import com.example.gym_tracker.core.common.enums.FitnessLevel
+import com.example.gym_tracker.core.common.enums.MuscleGroup
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.time.Duration
@@ -91,5 +95,25 @@ class Converters {
     @TypeConverter
     fun toLocalDate(value: Long?): LocalDate? {
         return value?.let { LocalDate.ofEpochDay(it) }
+    }
+    
+    @TypeConverter
+    fun fromExerciseCategory(value: ExerciseCategory?): String? {
+        return value?.name
+    }
+    
+    @TypeConverter
+    fun toExerciseCategory(value: String?): ExerciseCategory? {
+        return value?.let { ExerciseCategory.valueOf(it) }
+    }
+    
+    @TypeConverter
+    fun fromFitnessLevel(value: FitnessLevel?): String? {
+        return value?.name
+    }
+    
+    @TypeConverter
+    fun toFitnessLevel(value: String?): FitnessLevel? {
+        return value?.let { FitnessLevel.valueOf(it) }
     }
 }

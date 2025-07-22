@@ -6,9 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.gym_tracker.core.database.entity.ExerciseCategory
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
 import com.example.gym_tracker.core.database.entity.ExerciseEntity
-import com.example.gym_tracker.core.database.entity.MuscleGroup
 import kotlinx.coroutines.flow.Flow
 
 @Dao

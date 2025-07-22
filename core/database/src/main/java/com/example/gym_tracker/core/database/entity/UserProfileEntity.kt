@@ -2,6 +2,9 @@ package com.example.gym_tracker.core.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.gym_tracker.core.common.enums.Equipment
+import com.example.gym_tracker.core.common.enums.FitnessGoal
+import com.example.gym_tracker.core.common.enums.FitnessLevel
 import java.time.Instant
 import java.util.UUID
 
@@ -19,11 +22,3 @@ data class UserProfileEntity(
     val createdAt: Instant,
     val updatedAt: Instant
 )
-
-enum class FitnessLevel {
-    BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
-}
-
-enum class FitnessGoal {
-    STRENGTH, MUSCLE_BUILDING, WEIGHT_LOSS, ENDURANCE, GENERAL_FITNESS, POWERLIFTING, BODYBUILDING
-}

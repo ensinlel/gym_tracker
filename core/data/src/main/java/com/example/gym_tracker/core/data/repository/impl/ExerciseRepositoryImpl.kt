@@ -1,9 +1,11 @@
 package com.example.gym_tracker.core.data.repository.impl
 
+import com.example.gym_tracker.core.common.enums.Equipment
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
+import com.example.gym_tracker.core.common.enums.MuscleGroup
 import com.example.gym_tracker.core.data.mapper.toDomainModel
 import com.example.gym_tracker.core.data.mapper.toEntity
 import com.example.gym_tracker.core.data.model.Exercise
-import com.example.gym_tracker.core.data.model.ExerciseCategory
 import com.example.gym_tracker.core.data.repository.ExerciseRepository
 import com.example.gym_tracker.core.database.dao.ExerciseDao
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +39,7 @@ class ExerciseRepositoryImpl @Inject constructor(
     }
 
     override fun getExercisesByCategory(category: ExerciseCategory): Flow<List<Exercise>> {
-        return exerciseDao.getExercisesByCategory(category.toEntity()).map { entities ->
+        return exerciseDao.getExercisesByCategory(category).map { entities ->
             entities.map { it.toDomainModel() }
         }
     }
@@ -69,9 +71,7 @@ class ExerciseRepositoryImpl @Inject constructor(
     }
 
     override fun getAllCategories(): Flow<List<ExerciseCategory>> {
-        return exerciseDao.getAllCategories().map { entities ->
-            entities.map { it.toDomainModel() }
-        }
+        return exerciseDao.getAllCategories()
     }
 
     override fun getMostUsedExercisesSince(startTime: Long): Flow<List<Exercise>> {
@@ -127,11 +127,11 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Bench Press",
                 category = ExerciseCategory.CHEST,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.CHEST,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.TRICEPS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.FRONT_DELTS
+                    MuscleGroup.CHEST,
+                    MuscleGroup.TRICEPS,
+                    MuscleGroup.FRONT_DELTS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BARBELL,
+                equipment = Equipment.BARBELL,
                 instructions = listOf(
                     "Lie flat on bench with feet firmly on ground",
                     "Grip bar with hands slightly wider than shoulder width",
@@ -148,11 +148,11 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Dumbbell Bench Press",
                 category = ExerciseCategory.CHEST,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.CHEST,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.TRICEPS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.FRONT_DELTS
+                    MuscleGroup.CHEST,
+                    MuscleGroup.TRICEPS,
+                    MuscleGroup.FRONT_DELTS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.DUMBBELL,
+                equipment = Equipment.DUMBBELL,
                 instructions = listOf(
                     "Lie on bench holding dumbbells at chest level",
                     "Press dumbbells up and slightly inward",
@@ -170,12 +170,12 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Deadlift",
                 category = ExerciseCategory.BACK,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.LOWER_BACK,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.UPPER_BACK,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.GLUTES,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.HAMSTRINGS
+                    MuscleGroup.LOWER_BACK,
+                    MuscleGroup.UPPER_BACK,
+                    MuscleGroup.GLUTES,
+                    MuscleGroup.HAMSTRINGS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BARBELL,
+                equipment = Equipment.BARBELL,
                 instructions = listOf(
                     "Stand with feet hip-width apart, bar over mid-foot",
                     "Bend at hips and knees to grip bar",
@@ -192,10 +192,10 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Pull-ups",
                 category = ExerciseCategory.BACK,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.UPPER_BACK,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.BICEPS
+                    MuscleGroup.UPPER_BACK,
+                    MuscleGroup.BICEPS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BODYWEIGHT,
+                equipment = Equipment.BODYWEIGHT,
                 instructions = listOf(
                     "Hang from pull-up bar with overhand grip",
                     "Pull body up until chin clears bar",
@@ -213,11 +213,11 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Squat",
                 category = ExerciseCategory.LEGS,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.QUADRICEPS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.GLUTES,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.HAMSTRINGS
+                    MuscleGroup.QUADRICEPS,
+                    MuscleGroup.GLUTES,
+                    MuscleGroup.HAMSTRINGS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BARBELL,
+                equipment = Equipment.BARBELL,
                 instructions = listOf(
                     "Position bar on upper back/traps",
                     "Stand with feet shoulder-width apart",
@@ -234,11 +234,11 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Lunges",
                 category = ExerciseCategory.LEGS,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.QUADRICEPS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.GLUTES,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.HAMSTRINGS
+                    MuscleGroup.QUADRICEPS,
+                    MuscleGroup.GLUTES,
+                    MuscleGroup.HAMSTRINGS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BODYWEIGHT,
+                equipment = Equipment.BODYWEIGHT,
                 instructions = listOf(
                     "Step forward into lunge position",
                     "Lower back knee toward ground",
@@ -256,11 +256,11 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Overhead Press",
                 category = ExerciseCategory.SHOULDERS,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.FRONT_DELTS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.SIDE_DELTS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.TRICEPS
+                    MuscleGroup.FRONT_DELTS,
+                    MuscleGroup.SIDE_DELTS,
+                    MuscleGroup.TRICEPS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BARBELL,
+                equipment = Equipment.BARBELL,
                 instructions = listOf(
                     "Start with bar at shoulder level",
                     "Press bar straight up overhead",
@@ -278,9 +278,9 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Bicep Curls",
                 category = ExerciseCategory.ARMS,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.BICEPS
+                    MuscleGroup.BICEPS
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.DUMBBELL,
+                equipment = Equipment.DUMBBELL,
                 instructions = listOf(
                     "Hold dumbbells at sides with palms forward",
                     "Curl weights up toward shoulders",
@@ -298,10 +298,10 @@ class ExerciseRepositoryImpl @Inject constructor(
                 name = "Plank",
                 category = ExerciseCategory.CORE,
                 muscleGroups = listOf(
-                    com.example.gym_tracker.core.data.model.MuscleGroup.ABS,
-                    com.example.gym_tracker.core.data.model.MuscleGroup.OBLIQUES
+                    MuscleGroup.ABS,
+                    MuscleGroup.OBLIQUES
                 ),
-                equipment = com.example.gym_tracker.core.data.model.Equipment.BODYWEIGHT,
+                equipment = Equipment.BODYWEIGHT,
                 instructions = listOf(
                     "Start in push-up position",
                     "Hold body in straight line from head to heels",

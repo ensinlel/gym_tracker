@@ -24,6 +24,7 @@ import com.example.gym_tracker.core.data.model.Exercise
 @Composable
 fun ExerciseSelectionScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateToExerciseStats: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ExerciseSelectionViewModel = hiltViewModel()
 ) {
@@ -118,10 +119,10 @@ fun ExerciseSelectionScreen(
                             ExerciseCard(
                                 exerciseName = exercise.name,
                                 sets = 0, // Not relevant for selection
-                                reps = "Tap star to track PRs",
+                                reps = "Tap to view statistics",
                                 weight = null, // Not relevant for selection
                                 isStarred = exercise.isStarMarked,
-                                onClick = { /* Handle exercise details if needed */ },
+                                onClick = { onNavigateToExerciseStats(exercise.id) },
                                 onStarClick = {
                                     viewModel.toggleExerciseStar(exercise.id, !exercise.isStarMarked)
                                 }

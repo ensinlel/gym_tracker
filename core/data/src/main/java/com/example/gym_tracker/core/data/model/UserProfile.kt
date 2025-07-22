@@ -1,5 +1,8 @@
 package com.example.gym_tracker.core.data.model
 
+import com.example.gym_tracker.core.common.enums.Equipment
+import com.example.gym_tracker.core.common.enums.FitnessGoal
+import com.example.gym_tracker.core.common.enums.FitnessLevel
 import java.time.Instant
 
 /**
@@ -18,11 +21,3 @@ data class UserProfile(
     val createdAt: Instant,
     val updatedAt: Instant
 )
-
-enum class FitnessLevel {
-    BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
-}
-
-enum class FitnessGoal {
-    STRENGTH, MUSCLE_BUILDING, WEIGHT_LOSS, ENDURANCE, GENERAL_FITNESS, POWERLIFTING, BODYBUILDING
-}

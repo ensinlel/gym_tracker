@@ -3,11 +3,11 @@ package com.example.gym_tracker.core.database.dao
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.gym_tracker.core.common.enums.Equipment
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
+import com.example.gym_tracker.core.common.enums.MuscleGroup
 import com.example.gym_tracker.core.database.GymTrackerDatabase
-import com.example.gym_tracker.core.database.entity.Equipment
-import com.example.gym_tracker.core.database.entity.ExerciseCategory
 import com.example.gym_tracker.core.database.entity.ExerciseEntity
-import com.example.gym_tracker.core.database.entity.MuscleGroup
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

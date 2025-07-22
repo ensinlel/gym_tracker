@@ -131,6 +131,7 @@ val bottomNavItems = listOf(
         selectedIcon = Icons.Filled.Star,
         unselectedIcon = Icons.Outlined.Star
     ),
+
     BottomNavItem(
         screen = Screen.ExerciseSelection,
         selectedIcon = Icons.Filled.Settings,
