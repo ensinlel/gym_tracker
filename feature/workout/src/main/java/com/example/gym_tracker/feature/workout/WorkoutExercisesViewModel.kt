@@ -19,6 +19,22 @@ class WorkoutExercisesViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<WorkoutExercisesUiState>(WorkoutExercisesUiState.Loading)
     val uiState: StateFlow<WorkoutExercisesUiState> = _uiState.asStateFlow()
+    
+    // Keep track of current workout ID
+    private var currentWorkoutId: String = ""
+    
+    companion object {
+        // Static storage to persist across ViewModel instances until real persistence is implemented
+        private val workoutExercisesStorage = mutableMapOf<String, MutableList<WorkoutExerciseInstanceData>>()
+        
+        // Static storage for workout names to persist across ViewModel instances
+        private val workoutNamesStorage = mutableMapOf<String, String>()
+        
+        // Function to store workout name for an ID
+        fun setWorkoutName(workoutId: String, workoutName: String) {
+            workoutNamesStorage[workoutId] = workoutName
+        }
+    }
 
     /**
      * Load exercises for a specific workout
@@ -27,12 +43,23 @@ class WorkoutExercisesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = WorkoutExercisesUiState.Loading
             try {
-                // TODO: Replace with actual data loading from repositories
-                // For now, generate sample data
-                val sampleData = generateSampleWorkoutData(workoutId)
+                // Store current workout ID
+                currentWorkoutId = workoutId
+                
+                // Get workout name
+                val workoutName = getWorkoutName(workoutId)
+                
+                // Get persisted exercises for this workout, or empty list if none exist
+                val exercises = workoutExercisesStorage[workoutId] ?: mutableListOf()
+                
+                // Debug logging
+                println("DEBUG: Loading workout ID='$workoutId', workout name='$workoutName'")
+                println("DEBUG: Found ${exercises.size} exercises")
+                println("DEBUG: Storage contents: ${workoutExercisesStorage.keys}")
+                
                 _uiState.value = WorkoutExercisesUiState.Success(
-                    workoutName = sampleData.workoutName,
-                    exercises = sampleData.exercises
+                    workoutName = workoutName,
+                    exercises = exercises.toList()
                 )
             } catch (e: Exception) {
                 _uiState.value = WorkoutExercisesUiState.Error(e.message ?: "Unknown error")
@@ -45,16 +72,14 @@ class WorkoutExercisesViewModel @Inject constructor(
      */
     fun addExerciseToWorkout(exerciseId: String) {
         viewModelScope.launch {
-            // TODO: Implement actual exercise addition
-            // For now, reload the workout to show the change
             val currentState = _uiState.value
             if (currentState is WorkoutExercisesUiState.Success) {
-                // Add a new exercise instance
+                // Create a new exercise instance
                 val newExercise = WorkoutExerciseInstanceData(
                     exerciseInstance = ExerciseInstanceData(
                         id = "new_${System.currentTimeMillis()}",
                         exerciseId = exerciseId,
-                        workoutId = "workout1"
+                        workoutId = currentWorkoutId
                     ),
                     exercise = ExerciseData(
                         id = exerciseId,
@@ -64,8 +89,18 @@ class WorkoutExercisesViewModel @Inject constructor(
                     lastPerformed = null
                 )
                 
+                // Add to persistent storage
+                val exercisesList = workoutExercisesStorage.getOrPut(currentWorkoutId) { mutableListOf() }
+                exercisesList.add(newExercise)
+                
+                // Debug logging
+                println("DEBUG: Added exercise ${getExerciseName(exerciseId)} to workout $currentWorkoutId")
+                println("DEBUG: Workout $currentWorkoutId now has ${exercisesList.size} exercises")
+                println("DEBUG: Storage contents: ${workoutExercisesStorage.keys}")
+                
+                // Update UI state
                 _uiState.value = currentState.copy(
-                    exercises = currentState.exercises + newExercise
+                    exercises = exercisesList.toList()
                 )
             }
         }
@@ -91,6 +126,12 @@ class WorkoutExercisesViewModel @Inject constructor(
                     }
                 }
                 
+                // Update persistent storage
+                val workoutId = currentState.exercises.firstOrNull()?.exerciseInstance?.workoutId
+                if (workoutId != null) {
+                    workoutExercisesStorage[workoutId] = updatedExercises.toMutableList()
+                }
+                
                 _uiState.value = currentState.copy(exercises = updatedExercises)
             }
         }
@@ -114,6 +155,12 @@ class WorkoutExercisesViewModel @Inject constructor(
                     exercise.copy(sets = updatedSets)
                 }
                 
+                // Update persistent storage
+                val workoutId = currentState.exercises.firstOrNull()?.exerciseInstance?.workoutId
+                if (workoutId != null) {
+                    workoutExercisesStorage[workoutId] = updatedExercises.toMutableList()
+                }
+                
                 _uiState.value = currentState.copy(exercises = updatedExercises)
             }
         }
@@ -131,55 +178,26 @@ class WorkoutExercisesViewModel @Inject constructor(
             else -> "Workout"
         }
         
-        // Generate sample exercises for the workout
-        val exercises = listOf(
-            WorkoutExerciseInstanceData(
-                exerciseInstance = ExerciseInstanceData(
-                    id = "instance1",
-                    exerciseId = "1",
-                    workoutId = workoutId
-                ),
-                exercise = ExerciseData(
-                    id = "1",
-                    name = "Bench Press"
-                ),
-                sets = listOf(
-                    WorkoutSetData("set1", 60.0, 10),
-                    WorkoutSetData("set2", 65.0, 8),
-                    WorkoutSetData("set3", 70.0, 6)
-                ),
-                lastPerformed = LastPerformedData(
-                    weight = 70.0,
-                    reps = 8,
-                    date = "2024-01-10"
-                )
-            ),
-            WorkoutExerciseInstanceData(
-                exerciseInstance = ExerciseInstanceData(
-                    id = "instance2",
-                    exerciseId = "2",
-                    workoutId = workoutId
-                ),
-                exercise = ExerciseData(
-                    id = "2",
-                    name = "Incline Dumbbell Press"
-                ),
-                sets = listOf(
-                    WorkoutSetData("set4", 25.0, 12),
-                    WorkoutSetData("set5", 30.0, 10)
-                ),
-                lastPerformed = LastPerformedData(
-                    weight = 30.0,
-                    reps = 10,
-                    date = "2024-01-08"
-                )
-            )
-        )
+        // Start with empty workout - user can add exercises manually
+        val exercises = emptyList<WorkoutExerciseInstanceData>()
         
         return SampleWorkoutData(
             workoutName = workoutName,
             exercises = exercises
         )
+    }
+
+    private fun getWorkoutName(workoutId: String): String {
+        // First check if we have the name stored
+        workoutNamesStorage[workoutId]?.let { return it }
+        
+        // Fallback to hardcoded mapping for backwards compatibility
+        return when (workoutId) {
+            "1" -> "Push Day"
+            "2" -> "Pull Day"
+            "3" -> "Leg Day"
+            else -> "Workout"
+        }
     }
 
     private fun getExerciseName(exerciseId: String): String {

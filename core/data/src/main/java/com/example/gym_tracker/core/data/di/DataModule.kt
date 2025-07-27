@@ -5,11 +5,15 @@ import com.example.gym_tracker.core.data.repository.ExerciseRepository
 import com.example.gym_tracker.core.data.repository.ExerciseSetRepository
 import com.example.gym_tracker.core.data.repository.UserProfileRepository
 import com.example.gym_tracker.core.data.repository.WorkoutRepository
+import com.example.gym_tracker.core.data.repository.WorkoutTemplateRepository
+import com.example.gym_tracker.core.data.repository.WorkoutRoutineRepository
 import com.example.gym_tracker.core.data.repository.impl.AnalyticsRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseSetRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.UserProfileRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.WorkoutRepositoryImpl
+import com.example.gym_tracker.core.data.repository.impl.WorkoutTemplateRepositoryImpl
+import com.example.gym_tracker.core.data.repository.impl.WorkoutRoutineRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -52,4 +56,16 @@ abstract class DataModule {
     abstract fun bindAnalyticsRepository(
         analyticsRepositoryImpl: AnalyticsRepositoryImpl
     ): AnalyticsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWorkoutTemplateRepository(
+        workoutTemplateRepositoryImpl: WorkoutTemplateRepositoryImpl
+    ): WorkoutTemplateRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWorkoutRoutineRepository(
+        workoutRoutineRepositoryImpl: WorkoutRoutineRepositoryImpl
+    ): WorkoutRoutineRepository
 }

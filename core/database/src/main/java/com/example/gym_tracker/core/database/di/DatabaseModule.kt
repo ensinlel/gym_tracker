@@ -6,9 +6,13 @@ import com.example.gym_tracker.core.database.GymTrackerDatabase
 import com.example.gym_tracker.core.database.dao.ExerciseDao
 import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
+import com.example.gym_tracker.core.database.dao.RoutineScheduleDao
+import com.example.gym_tracker.core.database.dao.TemplateExerciseDao
 import com.example.gym_tracker.core.database.dao.UserProfileDao
 import com.example.gym_tracker.core.database.dao.WeightHistoryDao
 import com.example.gym_tracker.core.database.dao.WorkoutDao
+import com.example.gym_tracker.core.database.dao.WorkoutRoutineDao
+import com.example.gym_tracker.core.database.dao.WorkoutTemplateDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,13 +32,16 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             GymTrackerDatabase::class.java,
-            "gym_tracker_database"
+            "gym_tracker_database_v5"
         )
         .addMigrations(
             GymTrackerDatabase.MIGRATION_1_2,
             GymTrackerDatabase.MIGRATION_2_3,
-            GymTrackerDatabase.MIGRATION_3_4
+            GymTrackerDatabase.MIGRATION_3_4,
+            GymTrackerDatabase.MIGRATION_4_5
         )
+        .fallbackToDestructiveMigration()
+        .fallbackToDestructiveMigrationOnDowngrade()
         .build()
     }
 
@@ -66,5 +73,25 @@ object DatabaseModule {
     @Provides
     fun provideWeightHistoryDao(database: GymTrackerDatabase): WeightHistoryDao {
         return database.weightHistoryDao()
+    }
+
+    @Provides
+    fun provideWorkoutTemplateDao(database: GymTrackerDatabase): WorkoutTemplateDao {
+        return database.workoutTemplateDao()
+    }
+
+    @Provides
+    fun provideTemplateExerciseDao(database: GymTrackerDatabase): TemplateExerciseDao {
+        return database.templateExerciseDao()
+    }
+
+    @Provides
+    fun provideWorkoutRoutineDao(database: GymTrackerDatabase): WorkoutRoutineDao {
+        return database.workoutRoutineDao()
+    }
+
+    @Provides
+    fun provideRoutineScheduleDao(database: GymTrackerDatabase): RoutineScheduleDao {
+        return database.routineScheduleDao()
     }
 }

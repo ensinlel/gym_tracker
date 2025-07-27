@@ -9,15 +9,23 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.gym_tracker.core.database.dao.ExerciseDao
 import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
+import com.example.gym_tracker.core.database.dao.RoutineScheduleDao
+import com.example.gym_tracker.core.database.dao.TemplateExerciseDao
 import com.example.gym_tracker.core.database.dao.UserProfileDao
 import com.example.gym_tracker.core.database.dao.WeightHistoryDao
 import com.example.gym_tracker.core.database.dao.WorkoutDao
+import com.example.gym_tracker.core.database.dao.WorkoutRoutineDao
+import com.example.gym_tracker.core.database.dao.WorkoutTemplateDao
 import com.example.gym_tracker.core.database.entity.ExerciseEntity
 import com.example.gym_tracker.core.database.entity.ExerciseInstanceEntity
 import com.example.gym_tracker.core.database.entity.ExerciseSetEntity
+import com.example.gym_tracker.core.database.entity.RoutineScheduleEntity
+import com.example.gym_tracker.core.database.entity.TemplateExerciseEntity
 import com.example.gym_tracker.core.database.entity.UserProfileEntity
 import com.example.gym_tracker.core.database.entity.WeightHistoryEntity
 import com.example.gym_tracker.core.database.entity.WorkoutEntity
+import com.example.gym_tracker.core.database.entity.WorkoutRoutineEntity
+import com.example.gym_tracker.core.database.entity.WorkoutTemplateEntity
 
 @Database(
     entities = [
@@ -26,9 +34,13 @@ import com.example.gym_tracker.core.database.entity.WorkoutEntity
         ExerciseInstanceEntity::class,
         ExerciseSetEntity::class,
         UserProfileEntity::class,
-        WeightHistoryEntity::class
+        WeightHistoryEntity::class,
+        WorkoutTemplateEntity::class,
+        TemplateExerciseEntity::class,
+        WorkoutRoutineEntity::class,
+        RoutineScheduleEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -39,6 +51,10 @@ abstract class GymTrackerDatabase : RoomDatabase() {
     abstract fun exerciseSetDao(): ExerciseSetDao
     abstract fun userProfileDao(): UserProfileDao
     abstract fun weightHistoryDao(): WeightHistoryDao
+    abstract fun workoutTemplateDao(): WorkoutTemplateDao
+    abstract fun templateExerciseDao(): TemplateExerciseDao
+    abstract fun workoutRoutineDao(): WorkoutRoutineDao
+    abstract fun routineScheduleDao(): RoutineScheduleDao
     
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -190,6 +206,97 @@ abstract class GymTrackerDatabase : RoomDatabase() {
                     CREATE INDEX IF NOT EXISTS index_weight_history_userProfileId_recordedDate 
                     ON weight_history(userProfileId, recordedDate)
                 """.trimIndent())
+            }
+        }
+        
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create workout_templates table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS workout_templates (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        description TEXT NOT NULL,
+                        category TEXT NOT NULL,
+                        difficulty TEXT NOT NULL,
+                        estimatedDuration INTEGER NOT NULL,
+                        targetMuscleGroups TEXT NOT NULL,
+                        requiredEquipment TEXT NOT NULL,
+                        isPublic INTEGER NOT NULL,
+                        createdBy TEXT,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL,
+                        usageCount INTEGER NOT NULL,
+                        rating REAL NOT NULL,
+                        tags TEXT NOT NULL
+                    )
+                """.trimIndent())
+                
+                // Create template_exercises table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS template_exercises (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        templateId TEXT NOT NULL,
+                        exerciseId TEXT NOT NULL,
+                        orderInTemplate INTEGER NOT NULL,
+                        targetSets INTEGER NOT NULL,
+                        targetRepsMin INTEGER,
+                        targetRepsMax INTEGER,
+                        targetWeight REAL,
+                        restTime INTEGER NOT NULL,
+                        notes TEXT NOT NULL,
+                        isSuperset INTEGER NOT NULL,
+                        supersetGroup INTEGER,
+                        FOREIGN KEY(templateId) REFERENCES workout_templates(id) ON DELETE CASCADE,
+                        FOREIGN KEY(exerciseId) REFERENCES exercises(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                
+                // Create workout_routines table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS workout_routines (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        description TEXT NOT NULL,
+                        isActive INTEGER NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL
+                    )
+                """.trimIndent())
+                
+                // Create routine_schedules table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS routine_schedules (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        routineId TEXT NOT NULL,
+                        templateId TEXT NOT NULL,
+                        dayOfWeek INTEGER NOT NULL,
+                        timeOfDay TEXT,
+                        isActive INTEGER NOT NULL,
+                        notes TEXT NOT NULL,
+                        FOREIGN KEY(routineId) REFERENCES workout_routines(id) ON DELETE CASCADE,
+                        FOREIGN KEY(templateId) REFERENCES workout_templates(id) ON DELETE CASCADE
+                    )
+                """.trimIndent())
+                
+                // Create indices for better performance
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_templates_name ON workout_templates(name)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_templates_category ON workout_templates(category)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_templates_createdBy ON workout_templates(createdBy)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_templates_isPublic ON workout_templates(isPublic)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_templates_createdAt ON workout_templates(createdAt)")
+                
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_template_exercises_templateId ON template_exercises(templateId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_template_exercises_exerciseId ON template_exercises(exerciseId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_template_exercises_orderInTemplate ON template_exercises(orderInTemplate)")
+                
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_routines_isActive ON workout_routines(isActive)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_workout_routines_createdAt ON workout_routines(createdAt)")
+                
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_routineId ON routine_schedules(routineId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_templateId ON routine_schedules(templateId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_dayOfWeek ON routine_schedules(dayOfWeek)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_isActive ON routine_schedules(isActive)")
             }
         }
     }

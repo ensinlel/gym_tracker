@@ -26,6 +26,7 @@ import javax.inject.Inject
 @Composable
 fun StatisticsScreen(
     modifier: Modifier = Modifier,
+    onNavigateToComparativeAnalysis: () -> Unit = {},
     viewModel: StatisticsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -38,6 +39,13 @@ fun StatisticsScreen(
                         text = "Statistics",
                         style = MaterialTheme.typography.headlineMedium
                     ) 
+                },
+                actions = {
+                    TextButton(
+                        onClick = onNavigateToComparativeAnalysis
+                    ) {
+                        Text("Advanced Analysis")
+                    }
                 }
             )
         },

@@ -5,6 +5,7 @@ import com.example.gym_tracker.core.data.mapper.toEntity
 import com.example.gym_tracker.core.data.model.*
 import com.example.gym_tracker.core.data.repository.AnalyticsRepository
 import com.example.gym_tracker.core.database.dao.*
+import com.example.gym_tracker.core.common.enums.MuscleGroup
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -415,5 +416,150 @@ class AnalyticsRepositoryImpl @Inject constructor(
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate() 
         }.toSet()
+    }
+    
+    // Comparative Analysis Methods
+    override suspend fun getPeriodData(startDate: LocalDate, endDate: LocalDate): ComparisonPeriod? {
+        val startTime = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val endTime = endDate.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        
+        val workouts = workoutDao.getWorkoutsByDateRange(startTime, endTime).first()
+        
+        if (workouts.isEmpty()) {
+            return null
+        }
+        
+        val totalVolume = workouts.sumOf { it.totalVolume }
+        val workoutCount = workouts.size
+        val averageWeight = if (workoutCount > 0) totalVolume / workoutCount else 0.0
+        
+        // Count unique exercises across all workouts
+        val exerciseIds = mutableSetOf<String>()
+        for (workout in workouts) {
+            val exerciseInstances = exerciseInstanceDao.getExerciseInstancesByWorkout(workout.id).first()
+            exerciseIds.addAll(exerciseInstances.map { it.exerciseId })
+        }
+        
+        return ComparisonPeriod(
+            startDate = startDate,
+            endDate = endDate,
+            totalVolume = totalVolume,
+            averageWeight = averageWeight,
+            workoutCount = workoutCount,
+            exerciseCount = exerciseIds.size
+        )
+    }
+    
+    override suspend fun getMuscleGroupDistribution(): List<MuscleGroupDistribution> {
+        val exercises = exerciseDao.getAllExercises().first()
+        val muscleGroupData = mutableMapOf<MuscleGroup, MutableList<Double>>()
+        
+        // Initialize muscle group data
+        MuscleGroup.values().forEach { muscleGroup: MuscleGroup ->
+            muscleGroupData[muscleGroup] = mutableListOf()
+        }
+        
+        // Calculate volume for each exercise and group by muscle group
+        for (exercise in exercises) {
+            val exerciseInstances = exerciseInstanceDao.getExerciseInstancesByExerciseId(exercise.id).first()
+            var exerciseVolume = 0.0
+            
+            for (instance in exerciseInstances) {
+                val sets = exerciseSetDao.getSetsByExerciseInstance(instance.id).first()
+                exerciseVolume += sets.sumOf { set -> set.weight * set.reps }
+            }
+            
+            // For simplicity, assign each exercise to a primary muscle group
+            // In a real implementation, you'd have proper muscle group mapping
+            val primaryMuscleGroup = mapExerciseToMuscleGroup(exercise.name)
+            muscleGroupData[primaryMuscleGroup]?.add(exerciseVolume)
+        }
+        
+        // Convert to MuscleGroupDistribution objects
+        return muscleGroupData.map { (muscleGroup: MuscleGroup, volumes: MutableList<Double>) ->
+            MuscleGroupDistribution(
+                muscleGroup = muscleGroup,
+                exerciseCount = volumes.size,
+                totalVolume = volumes.sum(),
+                percentage = 0.0, // Will be calculated in the use case
+                color = "#000000" // Will be assigned in the use case
+            )
+        }.filter { it.totalVolume > 0 }
+    }
+    
+    override suspend fun getPersonalRecordHistory(exerciseId: String): List<PersonalRecord> {
+        val exerciseInstances = exerciseInstanceDao.getExerciseInstancesByExerciseId(exerciseId).first()
+        val records = mutableListOf<PersonalRecord>()
+        val exercise = exerciseDao.getExerciseById(exerciseId) ?: return emptyList()
+        
+        for (instance in exerciseInstances) {
+            val workout = workoutDao.getWorkoutById(instance.workoutId) ?: continue
+            val sets = exerciseSetDao.getSetsByExerciseInstance(instance.id).first()
+            
+            // Find the best set for this workout session
+            val bestSet = sets.filter { !it.isWarmup }.maxByOrNull { it.weight }
+            if (bestSet != null) {
+                val achievedDate = workout.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+                val isRecent = ChronoUnit.DAYS.between(achievedDate, LocalDate.now()) <= 30
+                
+                records.add(
+                    PersonalRecord(
+                        exerciseName = exercise.name,
+                        weight = bestSet.weight,
+                        reps = bestSet.reps,
+                        achievedDate = achievedDate,
+                        isRecent = isRecent
+                    )
+                )
+            }
+        }
+        
+        return records.sortedBy { it.achievedDate }
+    }
+    
+    /**
+     * Maps exercise name to primary muscle group
+     * This is a simplified implementation - in a real app you'd have proper muscle group data
+     */
+    private fun mapExerciseToMuscleGroup(exerciseName: String): MuscleGroup {
+        return when {
+            exerciseName.contains("bench", ignoreCase = true) || 
+            exerciseName.contains("chest", ignoreCase = true) || 
+            exerciseName.contains("push", ignoreCase = true) -> MuscleGroup.CHEST
+            
+            exerciseName.contains("squat", ignoreCase = true) || 
+            exerciseName.contains("leg", ignoreCase = true) || 
+            exerciseName.contains("quad", ignoreCase = true) -> MuscleGroup.QUADRICEPS
+            
+            exerciseName.contains("deadlift", ignoreCase = true) || 
+            exerciseName.contains("row", ignoreCase = true) || 
+            exerciseName.contains("pull", ignoreCase = true) || 
+            exerciseName.contains("back", ignoreCase = true) -> MuscleGroup.UPPER_BACK
+            
+            exerciseName.contains("shoulder", ignoreCase = true) || 
+            exerciseName.contains("press", ignoreCase = true) && 
+            !exerciseName.contains("bench", ignoreCase = true) -> MuscleGroup.FRONT_DELTS
+            
+            exerciseName.contains("curl", ignoreCase = true) || 
+            exerciseName.contains("bicep", ignoreCase = true) -> MuscleGroup.BICEPS
+            
+            exerciseName.contains("tricep", ignoreCase = true) || 
+            exerciseName.contains("dip", ignoreCase = true) -> MuscleGroup.TRICEPS
+            
+            exerciseName.contains("glute", ignoreCase = true) -> MuscleGroup.GLUTES
+            
+            exerciseName.contains("calf", ignoreCase = true) -> MuscleGroup.CALVES
+            
+            exerciseName.contains("core", ignoreCase = true) || 
+            exerciseName.contains("ab", ignoreCase = true) || 
+            exerciseName.contains("plank", ignoreCase = true) -> MuscleGroup.ABS
+            
+            exerciseName.contains("forearm", ignoreCase = true) || 
+            exerciseName.contains("grip", ignoreCase = true) -> MuscleGroup.FOREARMS
+            
+            exerciseName.contains("hamstring", ignoreCase = true) -> MuscleGroup.HAMSTRINGS
+            
+            else -> MuscleGroup.CHEST // Default fallback
+        }
     }
 }

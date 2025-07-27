@@ -15,6 +15,8 @@ import com.example.gym_tracker.feature.workout.WorkoutScreen
 import com.example.gym_tracker.feature.workout.ExerciseTrackingScreen
 import com.example.gym_tracker.feature.exercise.ExerciseSelectionScreen
 import com.example.gym_tracker.feature.profile.WeightTrackingScreen
+import com.example.gym_tracker.feature.statistics.ComparativeAnalysisScreen
+import com.example.gym_tracker.feature.statistics.StatisticsScreen
 import com.example.gym_tracker.ui.dashboard.DashboardScreen
 
 /**
@@ -203,6 +205,50 @@ fun GymTrackerNavigation(
                 }
             )
         }
+        
+        composable(
+            route = Screen.Statistics.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            com.example.gym_tracker.feature.statistics.StatisticsScreen(
+                onNavigateToComparativeAnalysis = {
+                    navController.navigate(Screen.ComparativeAnalysis.route)
+                }
+            )
+        }
+        
+        composable(
+            route = Screen.ComparativeAnalysis.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            com.example.gym_tracker.feature.statistics.ComparativeAnalysisScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -223,6 +269,8 @@ sealed class Screen(val route: String, val title: String) {
     object WorkoutExercises : Screen("workout_exercises/{workoutId}", "Workout Exercises") {
         fun createRoute(workoutId: String) = "workout_exercises/$workoutId"
     }
+    object Statistics : Screen("statistics", "Statistics")
+    object ComparativeAnalysis : Screen("comparative_analysis", "Comparative Analysis")
 }
 
 @Composable

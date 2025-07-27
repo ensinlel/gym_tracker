@@ -114,4 +114,20 @@ interface AnalyticsRepository {
      * Get all workout dates for a specific month
      */
     suspend fun getWorkoutDatesForMonth(month: java.time.YearMonth): Set<LocalDate>
+    
+    // Comparative Analysis Methods
+    /**
+     * Get period data for before/after comparisons
+     */
+    suspend fun getPeriodData(startDate: LocalDate, endDate: LocalDate): ComparisonPeriod?
+    
+    /**
+     * Get muscle group distribution data
+     */
+    suspend fun getMuscleGroupDistribution(): List<MuscleGroupDistribution>
+    
+    /**
+     * Get personal record history for a specific exercise
+     */
+    suspend fun getPersonalRecordHistory(exerciseId: String): List<PersonalRecord>
 }

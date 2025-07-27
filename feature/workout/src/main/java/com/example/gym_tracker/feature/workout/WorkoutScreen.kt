@@ -98,6 +98,11 @@ fun WorkoutScreen(
                         WorkoutGrid(
                             workouts = uiState.workouts,
                             onWorkoutClick = { workout -> 
+                                // Store workout name for the exercises screen
+                                com.example.gym_tracker.feature.workout.WorkoutExercisesViewModel.setWorkoutName(
+                                    workout.workout.id, 
+                                    workout.workout.name
+                                )
                                 // Navigate to workout exercises screen
                                 onNavigateToExerciseTracking(workout.workout.id)
                             },
@@ -107,6 +112,11 @@ fun WorkoutScreen(
                         WorkoutList(
                             workouts = uiState.workouts,
                             onWorkoutClick = { workout -> 
+                                // Store workout name for the exercises screen
+                                com.example.gym_tracker.feature.workout.WorkoutExercisesViewModel.setWorkoutName(
+                                    workout.workout.id, 
+                                    workout.workout.name
+                                )
                                 onNavigateToExerciseTracking(workout.workout.id)
                             },
                             onDeleteWorkout = { viewModel.deleteWorkout(it) }
