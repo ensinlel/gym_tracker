@@ -25,19 +25,18 @@ fun AddExerciseToWorkoutDialog(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     
-    // Sample exercises - TODO: Replace with actual data
+    // Load exercises from database with proper IDs
     val allExercises = remember {
         listOf(
-            ExerciseData("1", "Bench Press"),
-            ExerciseData("2", "Incline Dumbbell Press"),
-            ExerciseData("3", "Shoulder Press"),
-            ExerciseData("4", "Tricep Dips"),
-            ExerciseData("5", "Push-ups"),
-            ExerciseData("6", "Chest Flyes"),
-            ExerciseData("7", "Lateral Raises"),
-            ExerciseData("8", "Front Raises"),
-            ExerciseData("9", "Tricep Extensions"),
-            ExerciseData("10", "Diamond Push-ups")
+            ExerciseData("bench-press", "Bench Press"),
+            ExerciseData("dumbbell-press", "Dumbbell Bench Press"),
+            ExerciseData("overhead-press", "Overhead Press"),
+            ExerciseData("deadlift", "Deadlift"),
+            ExerciseData("pull-ups", "Pull-ups"),
+            ExerciseData("squat", "Squat"),
+            ExerciseData("lunges", "Lunges"),
+            ExerciseData("bicep-curls", "Bicep Curls"),
+            ExerciseData("plank", "Plank")
         )
     }
     

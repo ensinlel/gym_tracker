@@ -32,13 +32,14 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             GymTrackerDatabase::class.java,
-            "gym_tracker_database_v5"
+            "gym_tracker_database_v6"
         )
         .addMigrations(
             GymTrackerDatabase.MIGRATION_1_2,
             GymTrackerDatabase.MIGRATION_2_3,
             GymTrackerDatabase.MIGRATION_3_4,
-            GymTrackerDatabase.MIGRATION_4_5
+            GymTrackerDatabase.MIGRATION_4_5,
+            GymTrackerDatabase.MIGRATION_5_6
         )
         .fallbackToDestructiveMigration()
         .fallbackToDestructiveMigrationOnDowngrade()

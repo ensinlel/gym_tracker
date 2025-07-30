@@ -22,6 +22,12 @@ import java.util.UUID
             childColumns = ["exerciseId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        androidx.room.Index(value = ["workoutId"]),
+        androidx.room.Index(value = ["exerciseId"]),
+        androidx.room.Index(value = ["workoutId", "orderInWorkout"]),
+        androidx.room.Index(value = ["workoutId", "exerciseId"])
     ]
 )
 data class ExerciseInstanceEntity(

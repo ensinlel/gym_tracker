@@ -40,7 +40,7 @@ import com.example.gym_tracker.core.database.entity.WorkoutTemplateEntity
         WorkoutRoutineEntity::class,
         RoutineScheduleEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -297,6 +297,23 @@ abstract class GymTrackerDatabase : RoomDatabase() {
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_templateId ON routine_schedules(templateId)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_dayOfWeek ON routine_schedules(dayOfWeek)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS index_routine_schedules_isActive ON routine_schedules(isActive)")
+            }
+        }
+        
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Migration for workout exercise persistence enhancements
+                // Add any missing indices for better performance
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_exercise_instances_workoutId ON exercise_instances(workoutId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_exercise_instances_exerciseId ON exercise_instances(exerciseId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_exercise_instances_orderInWorkout ON exercise_instances(orderInWorkout)")
+                
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_exercise_sets_exerciseInstanceId ON exercise_sets(exerciseInstanceId)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_exercise_sets_setNumber ON exercise_sets(exerciseInstanceId, setNumber)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_exercise_sets_isWarmup ON exercise_sets(exerciseInstanceId, isWarmup)")
+                
+                // Ensure all tables have proper constraints and indices for the persistence system
+                // This migration ensures compatibility with the new persistence implementation
             }
         }
     }
