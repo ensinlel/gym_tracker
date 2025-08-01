@@ -265,6 +265,7 @@ class AnalyticsRepositoryImpl @Inject constructor(
 
                 personalRecords.add(
                     PersonalRecord(
+                        exerciseId = exercise.id,
                         exerciseName = exercise.name,
                         weight = bestSet.weight,
                         reps = bestSet.reps,
@@ -504,6 +505,7 @@ class AnalyticsRepositoryImpl @Inject constructor(
                 
                 records.add(
                     PersonalRecord(
+                        exerciseId = exercise.id,
                         exerciseName = exercise.name,
                         weight = bestSet.weight,
                         reps = bestSet.reps,

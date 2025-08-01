@@ -6,6 +6,7 @@ import com.example.gym_tracker.core.common.enums.ExerciseCategory
 import com.example.gym_tracker.core.common.enums.FitnessGoal
 import com.example.gym_tracker.core.common.enums.FitnessLevel
 import com.example.gym_tracker.core.common.enums.MuscleGroup
+import com.example.gym_tracker.core.database.entity.GoalType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.time.Duration
@@ -115,5 +116,15 @@ class Converters {
     @TypeConverter
     fun toFitnessLevel(value: String?): FitnessLevel? {
         return value?.let { FitnessLevel.valueOf(it) }
+    }
+    
+    @TypeConverter
+    fun fromGoalType(value: GoalType?): String? {
+        return value?.name
+    }
+    
+    @TypeConverter
+    fun toGoalType(value: String?): GoalType? {
+        return value?.let { GoalType.valueOf(it) }
     }
 }

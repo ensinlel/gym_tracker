@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,6 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.gym_tracker.feature.exercise.ExerciseSelectionViewModel
+import com.example.gym_tracker.feature.exercise.ExerciseSelectionUiState
+import com.example.gym_tracker.feature.exercise.AddExerciseDialog
 
 /**
  * Dialog for adding exercises to a workout
@@ -21,33 +26,15 @@ import androidx.compose.ui.window.Dialog
 fun AddExerciseToWorkoutDialog(
     onDismiss: () -> Unit,
     onExerciseSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ExerciseSelectionViewModel = hiltViewModel()
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var showAddExerciseDialog by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
     
-    // Load exercises from database with proper IDs
-    val allExercises = remember {
-        listOf(
-            ExerciseData("bench-press", "Bench Press"),
-            ExerciseData("dumbbell-press", "Dumbbell Bench Press"),
-            ExerciseData("overhead-press", "Overhead Press"),
-            ExerciseData("deadlift", "Deadlift"),
-            ExerciseData("pull-ups", "Pull-ups"),
-            ExerciseData("squat", "Squat"),
-            ExerciseData("lunges", "Lunges"),
-            ExerciseData("bicep-curls", "Bicep Curls"),
-            ExerciseData("plank", "Plank")
-        )
-    }
-    
-    val filteredExercises = remember(searchQuery) {
-        if (searchQuery.isBlank()) {
-            allExercises
-        } else {
-            allExercises.filter { 
-                it.name.contains(searchQuery, ignoreCase = true) 
-            }
-        }
+    LaunchedEffect(Unit) {
+        viewModel.loadExercises()
     }
     
     Dialog(onDismissRequest = onDismiss) {
@@ -74,8 +61,22 @@ fun AddExerciseToWorkoutDialog(
                         fontWeight = FontWeight.Bold
                     )
                     
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TextButton(onClick = { showAddExerciseDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Create")
+                        }
+                        
+                        TextButton(onClick = onDismiss) {
+                            Text("Cancel")
+                        }
                     }
                 }
                 
@@ -84,7 +85,10 @@ fun AddExerciseToWorkoutDialog(
                 // Search bar
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = { 
+                        searchQuery = it
+                        viewModel.searchExercises(it)
+                    },
                     label = { Text("Search exercises") },
                     leadingIcon = {
                         Icon(
@@ -99,39 +103,102 @@ fun AddExerciseToWorkoutDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 // Exercise list
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(filteredExercises) { exercise ->
-                        ExerciseSelectionItem(
-                            exercise = exercise,
-                            onSelect = { onExerciseSelected(exercise.id) }
-                        )
+                when (val state = uiState) {
+                    is ExerciseSelectionUiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                     
-                    if (filteredExercises.isEmpty()) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(32.dp),
-                                contentAlignment = Alignment.Center
+                    is ExerciseSelectionUiState.Success -> {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(state.exercises) { exercise ->
+                                ExerciseSelectionItem(
+                                    exercise = ExerciseData(exercise.id, exercise.name),
+                                    onSelect = { onExerciseSelected(exercise.id) }
+                                )
+                            }
+                            
+                            if (state.exercises.isEmpty()) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(32.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Text(
+                                                text = if (searchQuery.isNotEmpty()) {
+                                                    "No exercises found matching \"$searchQuery\""
+                                                } else {
+                                                    "No exercises available"
+                                                },
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            
+                                            TextButton(
+                                                onClick = { showAddExerciseDialog = true }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text("Create New Exercise")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    is ExerciseSelectionUiState.Error -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = if (searchQuery.isNotEmpty()) {
-                                        "No exercises found matching \"$searchQuery\""
-                                    } else {
-                                        "No exercises available"
-                                    },
+                                    text = "Error loading exercises",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.error
                                 )
+                                
+                                TextButton(onClick = { viewModel.loadExercises() }) {
+                                    Text("Retry")
+                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+    
+    // Add Exercise Dialog
+    if (showAddExerciseDialog) {
+        AddExerciseDialog(
+            onDismiss = { showAddExerciseDialog = false },
+            onExerciseCreated = { showAddExerciseDialog = false },
+            onCreateExercise = { name, category, muscleGroups, equipment ->
+                viewModel.createExercise(name, category, muscleGroups, equipment)
+            }
+        )
     }
 }
 

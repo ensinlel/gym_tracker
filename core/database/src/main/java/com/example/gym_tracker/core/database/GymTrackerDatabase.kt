@@ -9,6 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.gym_tracker.core.database.dao.ExerciseDao
 import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
+import com.example.gym_tracker.core.database.dao.GoalDao
 import com.example.gym_tracker.core.database.dao.RoutineScheduleDao
 import com.example.gym_tracker.core.database.dao.TemplateExerciseDao
 import com.example.gym_tracker.core.database.dao.UserProfileDao
@@ -19,6 +20,7 @@ import com.example.gym_tracker.core.database.dao.WorkoutTemplateDao
 import com.example.gym_tracker.core.database.entity.ExerciseEntity
 import com.example.gym_tracker.core.database.entity.ExerciseInstanceEntity
 import com.example.gym_tracker.core.database.entity.ExerciseSetEntity
+import com.example.gym_tracker.core.database.entity.GoalEntity
 import com.example.gym_tracker.core.database.entity.RoutineScheduleEntity
 import com.example.gym_tracker.core.database.entity.TemplateExerciseEntity
 import com.example.gym_tracker.core.database.entity.UserProfileEntity
@@ -38,9 +40,10 @@ import com.example.gym_tracker.core.database.entity.WorkoutTemplateEntity
         WorkoutTemplateEntity::class,
         TemplateExerciseEntity::class,
         WorkoutRoutineEntity::class,
-        RoutineScheduleEntity::class
+        RoutineScheduleEntity::class,
+        GoalEntity::class
     ],
-    version = 6,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -55,6 +58,7 @@ abstract class GymTrackerDatabase : RoomDatabase() {
     abstract fun templateExerciseDao(): TemplateExerciseDao
     abstract fun workoutRoutineDao(): WorkoutRoutineDao
     abstract fun routineScheduleDao(): RoutineScheduleDao
+    abstract fun goalDao(): GoalDao
     
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -314,6 +318,48 @@ abstract class GymTrackerDatabase : RoomDatabase() {
                 
                 // Ensure all tables have proper constraints and indices for the persistence system
                 // This migration ensures compatibility with the new persistence implementation
+            }
+        }
+        
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create goals table
+                database.execSQL("""
+                    CREATE TABLE IF NOT EXISTS goals (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        title TEXT NOT NULL,
+                        description TEXT NOT NULL,
+                        type TEXT NOT NULL,
+                        targetValue REAL NOT NULL,
+                        currentValue REAL NOT NULL DEFAULT 0.0,
+                        unit TEXT NOT NULL,
+                        targetDate TEXT,
+                        isCompleted INTEGER NOT NULL DEFAULT 0,
+                        completedAt INTEGER,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL,
+                        isActive INTEGER NOT NULL DEFAULT 1
+                    )
+                """.trimIndent())
+                
+                // Create indices for better performance
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_goals_type ON goals(type)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_goals_isCompleted ON goals(isCompleted)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_goals_isActive ON goals(isActive)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_goals_targetDate ON goals(targetDate)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_goals_createdAt ON goals(createdAt)")
+            }
+        }
+        
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add linkedExerciseId column to goals table
+                database.execSQL("""
+                    ALTER TABLE goals ADD COLUMN linkedExerciseId TEXT
+                """.trimIndent())
+                
+                // Create index for better performance
+                database.execSQL("CREATE INDEX IF NOT EXISTS index_goals_linkedExerciseId ON goals(linkedExerciseId)")
             }
         }
     }

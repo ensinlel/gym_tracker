@@ -30,6 +30,7 @@ include(":core:database")
 include(":core:network")
 include(":core:ui")
 include(":core:testing")
+include(":core:export")
 
 // Feature modules
 include(":feature:workout")

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -30,6 +31,7 @@ fun ExerciseSelectionScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    var showAddExerciseDialog by remember { mutableStateOf(false) }
     
     Scaffold(
         topBar = {
@@ -52,6 +54,13 @@ fun ExerciseSelectionScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { showAddExerciseDialog = true },
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text("Add Exercise") }
             )
         }
     ) { paddingValues ->
@@ -181,6 +190,17 @@ fun ExerciseSelectionScreen(
                 }
             }
         }
+    }
+    
+    // Add Exercise Dialog
+    if (showAddExerciseDialog) {
+        AddExerciseDialog(
+            onDismiss = { showAddExerciseDialog = false },
+            onExerciseCreated = { showAddExerciseDialog = false },
+            onCreateExercise = { name, category, muscleGroups, equipment ->
+                viewModel.createExercise(name, category, muscleGroups, equipment)
+            }
+        )
     }
 }
 

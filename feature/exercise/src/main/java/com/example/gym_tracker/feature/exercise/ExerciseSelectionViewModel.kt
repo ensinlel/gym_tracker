@@ -5,12 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.gym_tracker.core.data.model.Exercise
 import com.example.gym_tracker.core.data.repository.AnalyticsRepository
 import com.example.gym_tracker.core.data.repository.ExerciseRepository
+import com.example.gym_tracker.core.common.enums.ExerciseCategory
+import com.example.gym_tracker.core.common.enums.MuscleGroup
+import com.example.gym_tracker.core.common.enums.Equipment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 
 /**
@@ -95,6 +100,41 @@ class ExerciseSelectionViewModel @Inject constructor(
                 // Handle error - could show a snackbar or toast
                 // For now, just reload the exercises to revert the change
                 loadExercises()
+            }
+        }
+    }
+
+    /**
+     * Create a new exercise
+     */
+    fun createExercise(
+        name: String,
+        category: ExerciseCategory,
+        muscleGroups: List<MuscleGroup>,
+        equipment: Equipment
+    ) {
+        viewModelScope.launch {
+            try {
+                val newExercise = Exercise(
+                    id = UUID.randomUUID().toString(),
+                    name = name,
+                    category = category,
+                    muscleGroups = muscleGroups,
+                    equipment = equipment,
+                    instructions = emptyList(), // Can be added later
+                    createdAt = Instant.now(),
+                    updatedAt = Instant.now(),
+                    isCustom = true,
+                    isStarMarked = false
+                )
+                
+                exerciseRepository.insertExercise(newExercise)
+                
+                // Reload exercises to include the new one
+                loadExercises()
+            } catch (e: Exception) {
+                // Handle error - could show a snackbar or toast
+                _uiState.value = ExerciseSelectionUiState.Error("Failed to create exercise: ${e.message}")
             }
         }
     }

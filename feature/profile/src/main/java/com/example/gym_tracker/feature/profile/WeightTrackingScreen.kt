@@ -27,6 +27,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun WeightTrackingScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigateToGoals: () -> Unit = {},
+    onNavigateToExport: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: WeightTrackingViewModel = hiltViewModel()
 ) {
@@ -48,6 +50,14 @@ fun WeightTrackingScreen(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
                         )
+                    }
+                },
+                actions = {
+                    TextButton(onClick = onNavigateToGoals) {
+                        Text("Goals")
+                    }
+                    TextButton(onClick = onNavigateToExport) {
+                        Text("Export")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

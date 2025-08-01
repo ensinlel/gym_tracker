@@ -227,23 +227,7 @@
     - Git: Commit workout templates and routines
     - _Requirements: 5.1, 9.5_
 
-  - [ ] 6.2 Add advanced exercise tracking capabilities
-    - Implement rest timer with customizable intervals
-    - Add RPE (Rate of Perceived Exertion) tracking
-    - Create superset and circuit training support
-    - Test: Verify rest timer functions correctly with different intervals
-    - Test: Validate RPE tracking saves and displays properly
-    - Git: Commit advanced exercise tracking features
-    - _Requirements: 5.2, 5.3_
 
-  - [ ] 6.3 Build exercise recommendation system
-    - Implement exercise suggestion algorithm based on workout history
-    - Add muscle group balance analysis and recommendations
-    - Create progression tracking with automatic weight suggestions
-    - Test: Verify recommendations are relevant based on workout history
-    - Test: Validate muscle group balance calculations are accurate
-    - Git: Commit exercise recommendation system
-    - _Requirements: 5.4, 5.5, 6.4_
 
 - [x] 7. Analytics and Performance Tracking
   - [x] 7.1 Create comprehensive analytics engine
@@ -268,54 +252,22 @@
     - _Requirements: 6.1, 6.4, 3.5_
     - _Note: Implemented via dashboard analytics spec with comprehensive dashboard cards for all key metrics_
 
-  - [ ] 7.3 Add periodization and planning features
-    - Implement training cycle tracking and analysis
-    - Create deload week detection and recommendations
-    - Add goal setting and progress tracking towards specific targets
-    - Test: Verify periodization tracking works correctly
-    - Test: Validate goal progress tracking is accurate
-    - Git: Commit periodization and planning features
+  - [x] 7.3 Add goal setting and progress tracking
+
+
+
+    - Create goal creation interface for specific fitness targets (weight goals, consistency goals, etc.)
+    - Implement progress tracking with visual indicators and milestone celebrations
+    - Add goal history and achievement tracking
+    - Test: Verify goal progress calculations are accurate
+    - Test: Validate goal achievement notifications work correctly
+    - Git: Commit goal setting and progress tracking features
     - _Requirements: 6.5, 5.4_
 
-- [ ] 8. AI-Powered Coaching Integration
-  - [ ] 8.1 Set up LLM API integration infrastructure
-    - Create secure API client with authentication and rate limiting
-    - Implement request/response models for coaching interactions
-    - Add offline caching for common coaching tips and responses
-    - Test: Verify API client handles authentication and rate limiting correctly
-    - Test: Validate offline caching works when network is unavailable
-    - Git: Commit LLM API integration infrastructure
-    - _Requirements: 8.7, 8.8_
 
-  - [ ] 8.2 Implement exercise form coaching
-    - Create context builder for exercise-specific coaching requests
-    - Implement form tip generation based on user profile and performance
-    - Add muscle activation explanations and biomechanics information
-    - Test: Verify coaching tips are relevant and helpful for different exercises
-    - Test: Validate context builder creates appropriate requests for LLM
-    - Git: Commit exercise form coaching features
-    - _Requirements: 8.1, 8.2_
-
-  - [ ] 8.3 Build personalized recommendation system
-    - Implement AI-powered workout plan generation
-    - Create exercise modification suggestions based on limitations
-    - Add progression recommendations with reasoning explanations
-    - Test: Verify workout plans are appropriate for user goals and limitations
-    - Test: Validate progression recommendations are logical and safe
-    - Git: Commit personalized recommendation system
-    - _Requirements: 8.3, 8.4, 8.6_
-
-  - [ ] 8.4 Add performance analysis and feedback
-    - Implement pattern recognition for potential form issues
-    - Create personalized training advice based on progress data
-    - Add goal-specific coaching with adaptive recommendations
-    - Test: Verify performance analysis identifies relevant patterns
-    - Test: Validate coaching advice adapts based on user progress
-    - Git: Commit performance analysis and feedback features
-    - _Requirements: 8.5, 8.6_
 
 - [ ] 9. Data Import/Export and Backup System
-  - [ ] 9.1 Implement comprehensive data export
+  - [x] 9.1 Implement comprehensive data export
     - Create JSON export functionality for complete workout history
     - Add CSV export for spreadsheet analysis
     - Implement PDF report generation with charts and summaries
@@ -347,7 +299,7 @@
 
     - Create unit tests for all repository implementations
     - Add tests for analytics calculations and business logic
-    - Implement tests for AI coaching service with mocked responses
+
     - Test: Achieve minimum 80% code coverage for all business logic
     - Test: Verify all unit tests pass consistently
     - Git: Commit comprehensive unit test suite

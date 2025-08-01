@@ -37,6 +37,7 @@ fun DashboardAnalyticsContainer(
     onViewWeightHistoryClick: () -> Unit = {},
     onExerciseStarClick: (String, Boolean) -> Unit = { _, _ -> },
     onNavigateToExerciseSelection: () -> Unit = {},
+    onNavigateToGoals: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardAnalyticsViewModel = hiltViewModel()
 ) {
@@ -61,6 +62,12 @@ fun DashboardAnalyticsContainer(
             ) {
                 // Calendar Card - moved to top
                 CalendarCardContainer(
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                // Goals Card
+                GoalsCardContainer(
+                    onNavigateToGoals = onNavigateToGoals,
                     modifier = Modifier.fillMaxWidth()
                 )
                 

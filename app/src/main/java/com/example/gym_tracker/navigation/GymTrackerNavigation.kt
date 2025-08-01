@@ -15,6 +15,7 @@ import com.example.gym_tracker.feature.workout.WorkoutScreen
 import com.example.gym_tracker.feature.workout.ExerciseTrackingScreen
 import com.example.gym_tracker.feature.exercise.ExerciseSelectionScreen
 import com.example.gym_tracker.feature.profile.WeightTrackingScreen
+import com.example.gym_tracker.feature.profile.GoalsScreen
 import com.example.gym_tracker.feature.statistics.ComparativeAnalysisScreen
 import com.example.gym_tracker.feature.statistics.StatisticsScreen
 import com.example.gym_tracker.ui.dashboard.DashboardScreen
@@ -65,6 +66,9 @@ fun GymTrackerNavigation(
                         launchSingleTop = true
                         restoreState = true
                     }
+                },
+                onNavigateToGoals = {
+                    navController.navigate(Screen.Goals.route)
                 }
             )
         }
@@ -152,7 +156,36 @@ fun GymTrackerNavigation(
                 ) + fadeOut(animationSpec = tween(300))
             }
         ) {
-            WeightTrackingScreen()
+            WeightTrackingScreen(
+                onNavigateToGoals = {
+                    navController.navigate(Screen.Goals.route)
+                },
+                onNavigateToExport = {
+                    navController.navigate(Screen.Export.route)
+                }
+            )
+        }
+        
+        composable(
+            route = Screen.Goals.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            GoalsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
         
         composable(
@@ -249,6 +282,28 @@ fun GymTrackerNavigation(
                 }
             )
         }
+        
+        composable(
+            route = Screen.Export.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeIn(animationSpec = tween(300))
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { 300 },
+                    animationSpec = tween(300)
+                ) + fadeOut(animationSpec = tween(300))
+            }
+        ) {
+            com.example.gym_tracker.feature.profile.ExportScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -263,6 +318,7 @@ sealed class Screen(val route: String, val title: String) {
         fun createRoute(workoutId: String) = "exercise_tracking/$workoutId"
     }
     object Profile : Screen("profile", "Profile")
+    object Goals : Screen("goals", "Goals")
     object ExerciseStatistics : Screen("exercise_statistics/{exerciseId}", "Exercise Statistics") {
         fun createRoute(exerciseId: String) = "exercise_statistics/$exerciseId"
     }
@@ -271,6 +327,7 @@ sealed class Screen(val route: String, val title: String) {
     }
     object Statistics : Screen("statistics", "Statistics")
     object ComparativeAnalysis : Screen("comparative_analysis", "Comparative Analysis")
+    object Export : Screen("export", "Export Data")
 }
 
 @Composable

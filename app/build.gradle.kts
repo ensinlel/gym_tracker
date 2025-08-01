@@ -25,8 +25,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            multiDexEnabled = true
+        }
         release {
             isMinifyEnabled = false
+            multiDexEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -59,6 +64,7 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:network"))
     implementation(project(":core:ui"))
+    implementation(project(":core:export"))
     
     // Feature modules
     implementation(project(":feature:workout"))
@@ -71,6 +77,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    
+    // MultiDex support
+    implementation("androidx.multidex:multidex:2.0.1")
     
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))

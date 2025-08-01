@@ -4,6 +4,8 @@ import com.example.gym_tracker.core.data.mapper.toDomainModel
 import com.example.gym_tracker.core.data.mapper.toEntity
 import com.example.gym_tracker.core.data.model.ExerciseSet
 import com.example.gym_tracker.core.data.repository.ExerciseSetRepository
+import com.example.gym_tracker.core.data.repository.ExerciseInstanceRepository
+import com.example.gym_tracker.core.data.service.GoalProgressService
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,7 +17,9 @@ import javax.inject.Singleton
  */
 @Singleton
 class ExerciseSetRepositoryImpl @Inject constructor(
-    private val exerciseSetDao: ExerciseSetDao
+    private val exerciseSetDao: ExerciseSetDao,
+    private val exerciseInstanceRepository: ExerciseInstanceRepository,
+    private val goalProgressService: GoalProgressService
 ) : ExerciseSetRepository {
 
     override fun getSetsByExerciseInstance(exerciseInstanceId: String): Flow<List<ExerciseSet>> {
@@ -100,10 +104,34 @@ class ExerciseSetRepositoryImpl @Inject constructor(
 
     override suspend fun insertSet(set: ExerciseSet) {
         exerciseSetDao.insertSet(set.toEntity())
+        
+        // Update PR goals for this exercise if it's a new PR
+        try {
+            val exerciseInstance = exerciseInstanceRepository.getExerciseInstanceById(set.exerciseInstanceId)
+            exerciseInstance?.let { instance ->
+                goalProgressService.updatePRGoalsForExercise(instance.exerciseId)
+            }
+        } catch (e: Exception) {
+            // Don't fail the set insertion if goal update fails
+            println("Failed to update PR goals: ${e.message}")
+        }
     }
 
     override suspend fun insertSets(sets: List<ExerciseSet>) {
         exerciseSetDao.insertSets(sets.map { it.toEntity() })
+        
+        // Update PR goals for all exercises involved
+        try {
+            val exerciseIds = sets.mapNotNull { set ->
+                exerciseInstanceRepository.getExerciseInstanceById(set.exerciseInstanceId)?.exerciseId
+            }.distinct()
+            
+            exerciseIds.forEach { exerciseId ->
+                goalProgressService.updatePRGoalsForExercise(exerciseId)
+            }
+        } catch (e: Exception) {
+            println("Failed to update PR goals: ${e.message}")
+        }
     }
 
     override suspend fun updateSet(set: ExerciseSet) {

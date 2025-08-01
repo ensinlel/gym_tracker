@@ -6,6 +6,7 @@ import com.example.gym_tracker.core.database.GymTrackerDatabase
 import com.example.gym_tracker.core.database.dao.ExerciseDao
 import com.example.gym_tracker.core.database.dao.ExerciseInstanceDao
 import com.example.gym_tracker.core.database.dao.ExerciseSetDao
+import com.example.gym_tracker.core.database.dao.GoalDao
 import com.example.gym_tracker.core.database.dao.RoutineScheduleDao
 import com.example.gym_tracker.core.database.dao.TemplateExerciseDao
 import com.example.gym_tracker.core.database.dao.UserProfileDao
@@ -32,14 +33,16 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             GymTrackerDatabase::class.java,
-            "gym_tracker_database_v6"
+            "gym_tracker_database_v8"
         )
         .addMigrations(
             GymTrackerDatabase.MIGRATION_1_2,
             GymTrackerDatabase.MIGRATION_2_3,
             GymTrackerDatabase.MIGRATION_3_4,
             GymTrackerDatabase.MIGRATION_4_5,
-            GymTrackerDatabase.MIGRATION_5_6
+            GymTrackerDatabase.MIGRATION_5_6,
+            GymTrackerDatabase.MIGRATION_6_7,
+            GymTrackerDatabase.MIGRATION_7_8
         )
         .fallbackToDestructiveMigration()
         .fallbackToDestructiveMigrationOnDowngrade()
@@ -94,5 +97,10 @@ object DatabaseModule {
     @Provides
     fun provideRoutineScheduleDao(database: GymTrackerDatabase): RoutineScheduleDao {
         return database.routineScheduleDao()
+    }
+
+    @Provides
+    fun provideGoalDao(database: GymTrackerDatabase): GoalDao {
+        return database.goalDao()
     }
 }

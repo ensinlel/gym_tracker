@@ -64,6 +64,7 @@ data class ExerciseImprovement(
  * Data class representing personal record information
  */
 data class PersonalRecord(
+    val exerciseId: String,
     val exerciseName: String,
     val weight: Double,
     val reps: Int,

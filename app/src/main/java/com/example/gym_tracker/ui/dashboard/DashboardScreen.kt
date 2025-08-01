@@ -24,6 +24,7 @@ import java.time.LocalDate
 fun DashboardScreen(
     onNavigateToWorkouts: () -> Unit = {},
     onNavigateToExerciseSelection: () -> Unit = {},
+    onNavigateToGoals: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -42,14 +43,18 @@ fun DashboardScreen(
             )
         },
         floatingActionButton = {
-            GymTrackerFAB(
-                onClick = onNavigateToWorkouts
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Start Workout"
-                )
-            }
+            ExtendedFloatingActionButton(
+                onClick = onNavigateToWorkouts,
+                icon = { 
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    ) 
+                },
+                text = { Text("Log Workout") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         }
     ) { paddingValues ->
         LazyColumn(
@@ -75,7 +80,8 @@ fun DashboardScreen(
                         // Handle exercise star marking
                         // This is handled by the analytics system
                     },
-                    onNavigateToExerciseSelection = onNavigateToExerciseSelection
+                    onNavigateToExerciseSelection = onNavigateToExerciseSelection,
+                    onNavigateToGoals = onNavigateToGoals
                 )
             }
             

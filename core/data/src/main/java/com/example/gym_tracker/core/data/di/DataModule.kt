@@ -4,6 +4,7 @@ import com.example.gym_tracker.core.data.repository.AnalyticsRepository
 import com.example.gym_tracker.core.data.repository.ExerciseRepository
 import com.example.gym_tracker.core.data.repository.ExerciseInstanceRepository
 import com.example.gym_tracker.core.data.repository.ExerciseSetRepository
+import com.example.gym_tracker.core.data.repository.GoalRepository
 import com.example.gym_tracker.core.data.repository.UserProfileRepository
 import com.example.gym_tracker.core.data.repository.WorkoutRepository
 import com.example.gym_tracker.core.data.repository.WorkoutTemplateRepository
@@ -12,6 +13,7 @@ import com.example.gym_tracker.core.data.repository.impl.AnalyticsRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseInstanceRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.ExerciseSetRepositoryImpl
+import com.example.gym_tracker.core.data.repository.impl.GoalRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.UserProfileRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.WorkoutRepositoryImpl
 import com.example.gym_tracker.core.data.repository.impl.WorkoutTemplateRepositoryImpl
@@ -76,4 +78,10 @@ abstract class DataModule {
     abstract fun bindWorkoutRoutineRepository(
         workoutRoutineRepositoryImpl: WorkoutRoutineRepositoryImpl
     ): WorkoutRoutineRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGoalRepository(
+        goalRepositoryImpl: GoalRepositoryImpl
+    ): GoalRepository
 }
